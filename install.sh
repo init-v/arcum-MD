@@ -42,17 +42,21 @@ $PIP install --upgrade pip setuptools wheel --quiet
 echo "  Installing dependencies (this may take a few minutes on first run)..."
 $PIP install -e . --quiet
 
-# Verify numpy (binary deps can be corrupted on interrupted downloads)
-echo "  Verifying numpy..."
+# Verify critical binary deps (can be corrupted on interrupted downloads)
+echo "  Verifying dependencies..."
+
 if ! $PYTHON -c "import numpy" 2>/dev/null; then
   echo "  numpy import failed — reinstalling..."
   $PIP install --force-reinstall numpy --quiet
   if ! $PYTHON -c "import numpy" 2>/dev/null; then
-    echo ""
-    echo "  ✗ numpy could not be installed. Try running:"
-    echo "    .venv/bin/pip install --force-reinstall numpy"
+    echo "  ✗ numpy could not be installed. Try: .venv/bin/pip install --force-reinstall numpy"
     exit 1
   fi
+fi
+
+if ! $PYTHON -c "import idna; idna.IDNAError" 2>/dev/null; then
+  echo "  idna broken — reinstalling..."
+  $PIP install --force-reinstall "idna>=3.7" --quiet
 fi
 
 echo ""
