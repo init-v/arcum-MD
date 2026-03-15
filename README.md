@@ -8,13 +8,20 @@ A local-first CLI tool that converts PDFs, slide decks, and audio recordings int
 
 ## Install
 
+Requires Python 3.10+. One command installs everything:
+
 ```bash
-pip install arcum-md
+git clone https://github.com/your-org/arcum-md
+cd arcum-md
+./install.sh
 ```
 
-Or from source:
+That's it. The script checks your Python version, upgrades pip, and installs
+Arcum MD along with all extraction libraries (Marker, Docling, faster-whisper).
 
-```bash
+**On Windows**, use this instead:
+
+```powershell
 git clone https://github.com/your-org/arcum-md
 cd arcum-md
 pip install -e .
