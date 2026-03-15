@@ -42,11 +42,12 @@ def convert_file(
         result = extract(file, status_fn=status)
 
     except ImportError as exc:
-        print_error(
-            console,
-            f"Missing dependency for {suffix} extraction: {exc}\n"
-            f"  Run: pip install arcum-md",
-        )
+        msg = str(exc)
+        if "file too short" in msg or "numpy" in msg.lower():
+            hint = "Corrupted numpy — fix with:\n  .venv/bin/pip install --force-reinstall numpy"
+        else:
+            hint = f"Run: .venv/bin/pip install -e ."
+        print_error(console, f"Missing dependency for {suffix} extraction: {exc}\n  {hint}")
         return None
     except Exception as exc:  # noqa: BLE001
         print_error(console, f"Extraction failed: {exc}")
