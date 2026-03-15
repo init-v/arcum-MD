@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "arcum-md"
+version = "0.1.0"
+description = "Structured knowledge for humans now, agents next."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13",
+    "marker-pdf>=1.3",
+    "docling>=2.15",
+    "faster-whisper>=1.0",
+]
+
+[project.scripts]
+arcum = "arcum.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["arcum*"]
