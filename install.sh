@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+VENV_DIR=".venv"
+
 echo ""
 echo "  Installing Arcum MD..."
 echo ""
@@ -25,16 +27,31 @@ fi
 
 echo "  ✓ Python $VERSION"
 
+# Create virtual environment
+echo "  Creating virtual environment..."
+$PYTHON -m venv "$VENV_DIR"
+
+# Use the venv's pip and python from here on
+PIP="$VENV_DIR/bin/pip"
+PYTHON="$VENV_DIR/bin/python"
+
 # Upgrade pip and setuptools silently
-$PYTHON -m pip install --upgrade pip setuptools wheel --quiet
+$PIP install --upgrade pip setuptools wheel --quiet
 
 # Install the package and all dependencies
-$PYTHON -m pip install -e . --quiet
+echo "  Installing dependencies (this may take a few minutes on first run)..."
+$PIP install -e . --quiet
 
 echo ""
 echo "  ✓ Arcum MD installed."
 echo ""
-echo "  Try it:"
+echo "  To use it, activate the environment first:"
+echo ""
+echo "    source .venv/bin/activate"
 echo "    arcum --help"
 echo "    arcum convert yourfile.pdf"
+echo ""
+echo "  Or run it directly without activating:"
+echo ""
+echo "    .venv/bin/arcum convert yourfile.pdf"
 echo ""
