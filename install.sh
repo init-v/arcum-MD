@@ -59,6 +59,11 @@ if ! $PYTHON -c "import idna; idna.IDNAError" 2>/dev/null; then
   $PIP install --force-reinstall "idna>=3.7" --quiet
 fi
 
+if ! $PYTHON -c "from filelock import BaseFileLock" 2>/dev/null; then
+  echo "  filelock outdated — reinstalling..."
+  $PIP install --force-reinstall "filelock>=3.12" --quiet
+fi
+
 echo ""
 echo "  ✓ Arcum MD installed."
 echo ""
