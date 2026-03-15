@@ -27,6 +27,15 @@ fi
 
 echo "  ✓ Python $VERSION"
 
+# Wipe existing venv so we always start clean
+if [ -d "$VENV_DIR" ]; then
+  echo "  Removing existing virtual environment for a clean install..."
+  rm -rf "$VENV_DIR"
+fi
+
+# Clear pip cache to avoid reusing corrupted downloads
+$PYTHON -m pip cache purge --quiet 2>/dev/null || true
+
 # Create virtual environment
 echo "  Creating virtual environment..."
 $PYTHON -m venv "$VENV_DIR"
@@ -35,34 +44,12 @@ $PYTHON -m venv "$VENV_DIR"
 PIP="$VENV_DIR/bin/pip"
 PYTHON="$VENV_DIR/bin/python"
 
-# Upgrade pip and setuptools silently
-$PIP install --upgrade pip setuptools wheel --quiet
+# Upgrade pip and setuptools — no cache to avoid stale wheels
+$PIP install --no-cache-dir --upgrade pip setuptools wheel --quiet
 
-# Install the package and all dependencies
+# Install the package and all dependencies — no cache
 echo "  Installing dependencies (this may take a few minutes on first run)..."
-$PIP install -e . --quiet
-
-# Verify critical binary deps (can be corrupted on interrupted downloads)
-echo "  Verifying dependencies..."
-
-if ! $PYTHON -c "import numpy" 2>/dev/null; then
-  echo "  numpy import failed — reinstalling..."
-  $PIP install --force-reinstall numpy --quiet
-  if ! $PYTHON -c "import numpy" 2>/dev/null; then
-    echo "  ✗ numpy could not be installed. Try: .venv/bin/pip install --force-reinstall numpy"
-    exit 1
-  fi
-fi
-
-if ! $PYTHON -c "import idna; idna.IDNAError" 2>/dev/null; then
-  echo "  idna broken — reinstalling..."
-  $PIP install --force-reinstall "idna>=3.7" --quiet
-fi
-
-if ! $PYTHON -c "from filelock import BaseFileLock" 2>/dev/null; then
-  echo "  filelock outdated — reinstalling..."
-  $PIP install --force-reinstall "filelock>=3.12" --quiet
-fi
+$PIP install --no-cache-dir -e . --quiet
 
 echo ""
 echo "  ✓ Arcum MD installed."
