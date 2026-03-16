@@ -1,8 +1,12 @@
+
+
 # Arcum MD
 
 **Structured knowledge for humans now, agents next.**
 
 A local-first CLI tool that converts PDFs, slide decks, and audio recordings into clean structured Markdown.
+
+<img width="442" height="132" alt="image" src="https://github.com/user-attachments/assets/98bbf3c0-0a98-4fec-83a0-29e4400dbe8e" />
 
 ---
 
