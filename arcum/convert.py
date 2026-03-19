@@ -7,6 +7,7 @@ from typing import Optional
 
 from rich.console import Console
 
+from arcum import cache as _cache
 from arcum.display import print_status, print_error
 from arcum.output import ConversionResult
 
@@ -24,9 +25,20 @@ def convert_file(
             print_status(console, suffix.lstrip("."), msg)
 
     if not quiet:
-        size_mb = file.stat().st_size / 1_048_576
         console.print(f"\n  [bold]Arcum MD[/bold] — converting [cyan]{file.name}[/cyan]")
         console.print(f"  {'─' * 40}")
+
+    # Cache check — skip extraction entirely if file hasn't changed
+    cached = _cache.get(file)
+    if cached:
+        if not quiet:
+            status("Cache hit — returning previous result instantly.")
+        return ConversionResult(
+            source_path=file,
+            file_type=cached["file_type"],
+            body=cached["body"],
+            metadata=cached["metadata"],
+        )
 
     try:
         if suffix == ".pdf":
@@ -56,6 +68,13 @@ def convert_file(
     if not result or not result.body.strip():
         print_error(console, "Extraction returned no content. The file may be empty or unsupported.")
         return None
+
+    # Store in cache for next run
+    _cache.put(file, {
+        "file_type": result.file_type,
+        "body": result.body,
+        "metadata": result.metadata,
+    })
 
     if not quiet:
         console.print(f"  [dim]Done. {result.word_count:,} words extracted.[/dim]")

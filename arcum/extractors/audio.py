@@ -37,10 +37,11 @@ def extract(
     status(f"Detected: {file.name} ({size_mb:.1f} MB)")
     status(f"Loading Whisper model '{model_size}' (downloads once on first run)...")
 
-    model = WhisperModel(model_size, device="cpu", compute_type="int8")
+    device, compute_type = _best_device()
+    model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     status("Transcribing audio...")
-    segments, info = model.transcribe(str(file), beam_size=5)
+    segments, info = model.transcribe(str(file), beam_size=1, vad_filter=True)
 
     status(
         f"Detected language: {info.language} "
@@ -69,6 +70,17 @@ def extract(
         body=markdown,
         metadata=metadata,
     )
+
+
+def _best_device() -> tuple[str, str]:
+    """Return (device, compute_type) based on available hardware."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            return "cuda", "float16"
+    except ImportError:
+        pass
+    return "cpu", "int8"
 
 
 def _build_transcript(segments) -> tuple[str, float]:
